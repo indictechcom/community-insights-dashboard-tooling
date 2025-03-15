@@ -1,0 +1,1 @@
+SELECT * FROM revision LIMIT 10;
