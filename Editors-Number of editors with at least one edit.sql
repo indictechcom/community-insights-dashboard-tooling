@@ -4,5 +4,5 @@ SELECT
 FROM revision r
 JOIN actor a ON r.rev_actor = a.actor_id -- Link revisions to users
 GROUP BY edit_year
-HAVING edit_year >= YEAR(DATE_SUB(NOW(), INTERVAL 1 YEAR))  -- Rolling YoY filter
+HAVING edit_year >= YEAR(DATE_SUB(NOW(), INTERVAL 3 YEAR))  -- Rolling YoY filter
 ORDER BY edit_year DESC;
