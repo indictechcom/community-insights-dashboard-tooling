@@ -4,7 +4,7 @@ SELECT
     CASE 
     	WHEN page_namespace = 1 THEN "Article Talk"
         WHEN page_namespace = 3 THEN "User Talk"
-        WHEN page_namespace = 5 AND page_title LIKE 'Village_pump%' THEN 'Village Pump'
+        -- WHEN page_namespace = 5 AND page_title LIKE 'Village_pump%' THEN 'Village Pump'
         WHEN page_namespace = 5 THEN "Project Talk"
        
      END AS talk_page_type,
