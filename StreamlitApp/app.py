@@ -1,4 +1,6 @@
 import streamlit as st
+from StreamlitApp.components import content, contribution, contributions
+import os
 
 st.set_page_config(page_title="Indic Community Insights Dashboard", layout="wide")
 
@@ -36,12 +38,14 @@ if category == "Overview":
     """)
 
 elif category == "Content":
-    # Execute the content page with the current context
-    exec(open("components/content.py").read(), globals())
+    base_path = os.path.dirname(__file__)
+    file_path = os.path.join(base_path, "components/content.py")
+
+    exec(open(file_path).read(), globals())
 
 elif category == "Contribution":
-    # Execute the contribution page with the current context
-    exec(open("components/contribution.py").read(), globals())
+    base_path = os.path.dirname(__file__)
+    file_path = os.path.join(base_path, "components/contribution.py")
 
 
 
