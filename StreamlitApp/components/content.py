@@ -52,7 +52,7 @@ def load_data(wiki, data_type="templates"):
     
     return pd.read_csv(file_map[data_type][wiki], sep="\t")
 
-def show_content_page(wiki_filter):
+def show_content_page(date_filter, wiki_filter):
     st.title("CONTENT - VISUALISATIONS")
 
     col1, col2 = st.columns([2,1])
@@ -255,37 +255,27 @@ def show_content_page(wiki_filter):
         st.table(top10_pages[["page_title", "edit_count"]].reset_index(drop=True))
 
         
-        
-
-        
     with col8:
         st.subheader("Deleted pages")
-        # Load deleted pages data
         df_deleted = load_data(wiki_filter, "deleted_pages")
 
-        # Month names same as app.py
         months = [
             "January","February","March","April","May","June",
             "July","August","September","October","November","December"
         ]
 
-        # Read selected month/year from globals() (set in app.py as date_filter)
-        if 'date_filter' in globals() and isinstance(globals()['date_filter'], (list, tuple)):
-            sel_month, sel_year = globals()['date_filter']
-        else:
-            sel_month = months[datetime.date.today().month - 1]
-            sel_year = datetime.date.today().year
+        
+        sel_month, sel_year = date_filter
 
         # Convert month name to number
-        try:
-            month_num = months.index(sel_month) + 1
-        except ValueError:
-            month_num = datetime.date.today().month
+        month_num = months.index(sel_month) + 1
 
-        # Parse Deletion_Date and filter to selected month/year
         df_deleted['Deletion_Date'] = pd.to_datetime(df_deleted['Deletion_Date'], errors='coerce')
         df_filtered = df_deleted[df_deleted['Deletion_Date'].notna()]
-        df_filtered = df_filtered[(df_filtered['Deletion_Date'].dt.year == int(sel_year)) & (df_filtered['Deletion_Date'].dt.month == int(month_num))]
+        df_filtered = df_filtered[
+            (df_filtered['Deletion_Date'].dt.year == int(sel_year)) &
+            (df_filtered['Deletion_Date'].dt.month == int(month_num))
+        ]
 
         # Aggregate counts per day (if a numeric deleted_pages column exists, sum it; otherwise count rows)
         if 'deleted_pages' in df_filtered.columns and pd.api.types.is_numeric_dtype(df_filtered['deleted_pages']):
@@ -315,7 +305,3 @@ def show_content_page(wiki_filter):
 
         st.pyplot(fig, use_container_width=True)
 
-
-# Call the function when this file is executed
-if 'wiki_filter' in globals():
-    show_content_page(wiki_filter)

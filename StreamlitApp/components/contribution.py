@@ -3,6 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import calendar
+import datetime
 
 
 
@@ -77,7 +78,7 @@ def load_data(wiki, data_type="templates"):
 
 
 
-def show_contribution_page():
+def show_contribution_page(wiki_filter, date_filter, date_year):
     st.title("CONTRIBUTION - VISUALISATIONS")
 
     
@@ -521,5 +522,4 @@ def show_contribution_page():
 
         
 
-# Call the function when this file is executed
-show_contribution_page()
+
