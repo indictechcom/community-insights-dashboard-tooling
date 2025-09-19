@@ -4,52 +4,57 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 import calendar
+import os
 
-# Load data function
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "..", "data")
+
 def load_data(wiki, data_type="templates"):
     file_map = {
         "templates": {
-            "tewiki": "data/top_5_templates/top_5_templates_te.tsv",
-            "hiwiki": "data/top_5_templates/top_5_templates_hi.tsv",
-            "mlwiki": "data/top_5_templates/top_5_templates_ml.tsv",
+            "tewiki": os.path.join(DATA_DIR, "top_5_templates", "top_5_templates_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "top_5_templates", "top_5_templates_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "top_5_templates", "top_5_templates_ml.tsv"),
         },
-        "untouched":{
-            "tewiki": "data/untouched_pages/untouched_pages_te.tsv",
-            "hiwiki": "data/untouched_pages/untouched_pages_hi.tsv",
-            "mlwiki": "data/untouched_pages/untouched_pages_ml.tsv",
+        "untouched": {
+            "tewiki": os.path.join(DATA_DIR, "untouched_pages", "untouched_pages_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "untouched_pages", "untouched_pages_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "untouched_pages", "untouched_pages_ml.tsv"),
         },
         "platform": {
-            "tewiki": "data/by_platform/by_platform_te.tsv",
-            "hiwiki": "data/by_platform/by_platform_hi.tsv",
-            "mlwiki": "data/by_platform/by_platform_ml.tsv",
+            "tewiki": os.path.join(DATA_DIR, "by_platform", "by_platform_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "by_platform", "by_platform_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "by_platform", "by_platform_ml.tsv"),
         },
-        "tool":{
-            "tewiki": "data/by_tools/by_tools_te.tsv",
-            "hiwiki": "data/by_tools/by_tools_hi.tsv",
-            "mlwiki": "data/by_tools/by_tools_ml.tsv",
+        "tool": {
+            "tewiki": os.path.join(DATA_DIR, "by_tools", "by_tools_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "by_tools", "by_tools_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "by_tools", "by_tools_ml.tsv"),
         },
         "page_length": {
-            "tewiki": "data/content_namespace/content_namespace_te.tsv",
-            "hiwiki": "data/content_namespace/content_namespace_hi.tsv",
-            "mlwiki": "data/content_namespace/content_namespace_ml.tsv",
+            "tewiki": os.path.join(DATA_DIR, "content_namespace", "content_namespace_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "content_namespace", "content_namespace_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "content_namespace", "content_namespace_ml.tsv"),
         },
         "namespace": {
-            "tewiki": "data/pages_by_namespace/pages_by_namespace_te.tsv",
-            "hiwiki": "data/pages_by_namespace/pages_by_namespace_hi.tsv",
-            "mlwiki": "data/pages_by_namespace/pages_by_namespace_ml.tsv",
+            "tewiki": os.path.join(DATA_DIR, "pages_by_namespace", "pages_by_namespace_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "pages_by_namespace", "pages_by_namespace_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "pages_by_namespace", "pages_by_namespace_ml.tsv"),
         },
-        "top_edited_pages":{
-            "tewiki": "data/top_edited_pages/top_edited_content_pages_te.tsv",
-            "hiwiki": "data/top_edited_pages/top_edited_content_pages_hi.tsv",
-            "mlwiki": "data/top_edited_pages/top_edited_content_pages_ml.tsv",
+        "top_edited_pages": {
+            "tewiki": os.path.join(DATA_DIR, "top_edited_pages", "top_edited_content_pages_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "top_edited_pages", "top_edited_content_pages_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "top_edited_pages", "top_edited_content_pages_ml.tsv"),
         },
-        "deleted_pages":{
-            "tewiki": "data/deleted_pages/deleted_pages--tewiki.tsv",
-            "hiwiki": "data/deleted_pages/deleted_pages--hiwiki.tsv",
-            "mlwiki": "data/deleted_pages/deleted_pages--mlwiki.tsv",
+        "deleted_pages": {
+            "tewiki": os.path.join(DATA_DIR, "deleted_pages", "deleted_pages--tewiki.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "deleted_pages", "deleted_pages--hiwiki.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "deleted_pages", "deleted_pages--mlwiki.tsv"),
         }
     }
-    
+
     return pd.read_csv(file_map[data_type][wiki], sep="\t")
 
 def show_content_page(date_filter, wiki_filter):

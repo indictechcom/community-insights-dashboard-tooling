@@ -4,77 +4,76 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import calendar
 import datetime
+import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "..", "data")
 
-
-# Load data function
-def load_data(wiki, data_type="templates"):
+def load_data(wiki, data_type="editors-activity-5edits"):
     file_map = {
         "editors-activity-5edits": {
-            "tewiki": "data/editor_activity_yoy_5edits/editor_activity_5edits_te.tsv",
-            "hiwiki": "data/editor_activity_yoy_5edits/editor_activity_5edits_hi.tsv",
-            "mlwiki": "data/editor_activity_yoy_5edits/editor_activity_5edits_ml.tsv",
+            "tewiki": os.path.join(DATA_DIR, "editor_activity_yoy_5edits", "editor_activity_5edits_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "editor_activity_yoy_5edits", "editor_activity_5edits_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "editor_activity_yoy_5edits", "editor_activity_5edits_ml.tsv"),
         },
         "editors-activity-1edit": {
-            "tewiki": "data/editor_activity_yoy_1edit/editors_activity_1edit_te.tsv",
-            "hiwiki": "data/editor_activity_yoy_1edit/editors_activity_1edit_hi.tsv",
-            "mlwiki": "data/editor_activity_yoy_1edit/editors_activity_1edit_ml.tsv",
-        } ,
-        'user-activation': {
-            'tewiki': 'data/user_activation/new_users_activated_te.tsv',
-            'hiwiki': 'data/user_activation/new_users_activated_hi.tsv',
-            'mlwiki': 'data/user_activation/new_users_activated_ml.tsv',
-        } ,
-        'user-edit-buckets': {
-            'tewiki': 'data/user_edit_buckets/user-edit-bucket-te.tsv',
-            'hiwiki': 'data/user_edit_buckets/user-edit-bucket-hi.tsv',
-            'mlwiki': 'data/user_edit_buckets/user-edit-bucket-ml.tsv',
-        } ,
-        'user-rights-stats': {
-            'tewiki': 'data/user_rights_stats/user-right-te.tsv',
-            'hiwiki': 'data/user_rights_stats/user-right-hi.tsv',
-            'mlwiki': 'data/user_rights_stats/user-right-ml.tsv',
-        } ,
-        'avg-edit-size-by-bucket': {
-            'tewiki' : 'data/avg_edit_size_by_bucket/avg_edit_size_te.tsv',
-            'hiwiki' : 'data/avg_edit_size_by_bucket/avg_edit_size_hi.tsv',
-            'mlwiki' : 'data/avg_edit_size_by_bucket/avg_edit_size_ml.tsv'
+            "tewiki": os.path.join(DATA_DIR, "editor_activity_yoy_1edit", "editors_activity_1edit_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "editor_activity_yoy_1edit", "editors_activity_1edit_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "editor_activity_yoy_1edit", "editors_activity_1edit_ml.tsv"),
         },
-        'talk-page-activity': {
-            'tewiki': 'data/edits_on_talk_pages/edits_on_talk_pages_te.tsv',
-            'hiwiki': 'data/edits_on_talk_pages/edits_on_talk_pages_hi.tsv',
-            'mlwiki': 'data/edits_on_talk_pages/edits_on_talk_pages_ml.tsv',
+        "user-activation": {
+            "tewiki": os.path.join(DATA_DIR, "user_activation", "new_users_activated_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "user_activation", "new_users_activated_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "user_activation", "new_users_activated_ml.tsv"),
         },
-        'reverted_rollback_undo': {
-            'tewiki': 'data/reverted_rollback_undo/reverted_rollback_undo--tewiki.tsv',
-            'hiwiki': 'data/reverted_rollback_undo/reverted_rollback_undo--hiwiki.tsv',
-            'mlwiki': 'data/reverted_rollback_undo/reverted_rollback_undo--mlwiki.tsv',
+        "user-edit-buckets": {
+            "tewiki": os.path.join(DATA_DIR, "user_edit_buckets", "user-edit-bucket-te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "user_edit_buckets", "user-edit-bucket-hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "user_edit_buckets", "user-edit-bucket-ml.tsv"),
         },
-        
-        'automated_edits': {
-            'tewiki': 'data/automated_edits/Automated_edits--tewiki.tsv',
-            'hiwiki': 'data/automated_edits/Automated_edits--hiwiki.tsv',
-            'mlwiki': 'data/automated_edits/Automated_edits--mlwiki.tsv',
+        "user-rights-stats": {
+            "tewiki": os.path.join(DATA_DIR, "user_rights_stats", "user-right-te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "user_rights_stats", "user-right-hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "user_rights_stats", "user-right-ml.tsv"),
         },
-        'non-bot-users': {
-            'tewiki': 'data/non-bot-users/non_bot_te.tsv',
-            'hiwiki': 'data/non-bot-users/non_bot_hi.tsv',
-            'mlwiki': 'data/non-bot-users/non_bot_ml.tsv',
+        "avg-edit-size-by-bucket": {
+            "tewiki": os.path.join(DATA_DIR, "avg_edit_size_by_bucket", "avg_edit_size_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "avg_edit_size_by_bucket", "avg_edit_size_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "avg_edit_size_by_bucket", "avg_edit_size_ml.tsv"),
         },
-        'blocked_ips': {
-            'tewiki': 'data/blocked_ips/blocked_ips_te.tsv',    
-            'hiwiki': 'data/blocked_ips/blocked_ips_hi.tsv',
-            'mlwiki': 'data/blocked_ips/blocked_ips_ml.tsv',
+        "talk-page-activity": {
+            "tewiki": os.path.join(DATA_DIR, "edits_on_talk_pages", "edits_on_talk_pages_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "edits_on_talk_pages", "edits_on_talk_pages_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "edits_on_talk_pages", "edits_on_talk_pages_ml.tsv"),
         },
-        'total-users': {
-            'tewiki': 'data/total_users/total_users_te.tsv',
-            'hiwiki': 'data/total_users/total_users_hi.tsv',
-            'mlwiki': 'data/total_users/total_users_ml.tsv',
+        "reverted_rollback_undo": {
+            "tewiki": os.path.join(DATA_DIR, "reverted_rollback_undo", "reverted_rollback_undo--tewiki.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "reverted_rollback_undo", "reverted_rollback_undo--hiwiki.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "reverted_rollback_undo", "reverted_rollback_undo--mlwiki.tsv"),
+        },
+        "automated_edits": {
+            "tewiki": os.path.join(DATA_DIR, "automated_edits", "Automated_edits--tewiki.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "automated_edits", "Automated_edits--hiwiki.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "automated_edits", "Automated_edits--mlwiki.tsv"),
+        },
+        "non-bot-users": {
+            "tewiki": os.path.join(DATA_DIR, "non-bot-users", "non_bot_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "non-bot-users", "non_bot_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "non-bot-users", "non_bot_ml.tsv"),
+        },
+        "blocked_ips": {
+            "tewiki": os.path.join(DATA_DIR, "blocked_ips", "blocked_ips_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "blocked_ips", "blocked_ips_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "blocked_ips", "blocked_ips_ml.tsv"),
+        },
+        "total-users": {
+            "tewiki": os.path.join(DATA_DIR, "total_users", "total_users_te.tsv"),
+            "hiwiki": os.path.join(DATA_DIR, "total_users", "total_users_hi.tsv"),
+            "mlwiki": os.path.join(DATA_DIR, "total_users", "total_users_ml.tsv"),
         },
     }
 
     return pd.read_csv(file_map[data_type][wiki], sep="\t")
-
 
 
 
