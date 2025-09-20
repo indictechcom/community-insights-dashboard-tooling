@@ -80,6 +80,20 @@ def load_data(wiki, data_type="editors-activity-5edits"):
 def show_contribution_page(wiki_filter, date_filter, date_year):
     st.title("CONTRIBUTION - VISUALISATIONS")
 
+    sel_month, sel_year = date_filter
+    wiki = wiki_filter
+
+    months = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+    ]
+
+    # Convert month name → number
+    try:
+        month_num = months.index(sel_month) + 1
+    except ValueError:
+        month_num = datetime.date.today().month
+
     
     col1, col2 = st.columns([1, 0.70])
     with col1:
@@ -133,38 +147,47 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
 
     with col2:
         st.subheader("Project health indicators - edits on talk pages")
-        wiki = wiki_filter if "wiki_filter" in globals() else "tewiki"
+        wiki = wiki_filter
 
-        # Load data
+        # Load talk page activity data
         df = load_data(wiki, "talk-page-activity")
-        df["year"] = df["year"].astype(int)
-        df["month"] = df["month"].astype(int)
-        df["edit_count"] = df["edit_count"].astype(int)
+
+        # Ensure correct types
+        df["year"] = pd.to_numeric(df["year"], errors="coerce")
+        df["month"] = pd.to_numeric(df["month"], errors="coerce")
+        df["edit_count"] = pd.to_numeric(df["edit_count"], errors="coerce")
+        df = df.dropna(subset=["year", "month", "edit_count"])
 
         # Convert to datetime
-        df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+        df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1), errors="coerce")
 
-        # Group & pivot
-        yearly_df = df.groupby(["year", "talk_page_type"])["edit_count"].sum().reset_index()
+        # Group yearly by talk page type
+        yearly_df = (
+            df.groupby(["year", "talk_page_type"])["edit_count"]
+            .sum()
+            .reset_index()
+        )
+
+        # Pivot to wide format
         yearly_pivot = yearly_df.pivot(
-            index="year",
-            columns="talk_page_type",
-            values="edit_count"
+            index="year", columns="talk_page_type", values="edit_count"
         ).fillna(0)
 
+        # Ensure consistent column order
         yearly_pivot = yearly_pivot.reindex(
             columns=["Article Talk", "User Talk", "Project Talk"],
             fill_value=0
         )
 
+        # Color mapping
         COLOR_MAP = {
-            "Article Talk": "#1f77b4",
-            "User Talk": "#ff7f0e",
-            "Project Talk": "#2ca02c",
+            "Article Talk": "#1f77b4",   # blue
+            "User Talk": "#ff7f0e",      # orange
+            "Project Talk": "#2ca02c",   # green
         }
 
-        # Plot
-        fig, ax = plt.subplots(figsize=(6, 6))
+        # Plot stacked bar chart
+        fig, ax = plt.subplots(figsize=(7, 5))
         yearly_pivot.plot(
             kind="bar",
             stacked=True,
@@ -172,13 +195,13 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
             color=[COLOR_MAP.get(col, "#333333") for col in yearly_pivot.columns],
             alpha=0.85,
             edgecolor="black",
-            linewidth=0.5
+            linewidth=0.6
         )
 
-        ax.set_title(f"Yearly Edits by Talk Page Type - {wiki}", fontsize=12)
-        ax.set_xlabel("Year")
-        ax.set_ylabel("Number of Edits")
-        ax.legend(title="Talk Page Type", fontsize=9)
+        ax.set_title(f"Yearly Edits on Talk Pages – {wiki}", fontsize=14, fontweight="bold")
+        ax.set_xlabel("Year", fontsize=12)
+        ax.set_ylabel("Number of Edits", fontsize=12)
+        ax.legend(title="Talk Page Type", fontsize=10, title_fontsize=11)
         ax.grid(axis="y", linestyle="--", alpha=0.5)
 
         st.pyplot(fig)
@@ -187,46 +210,41 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
     col4, col5 = st.columns(2)
     with col4:
         st.subheader("Edits reverted or rolled back or undo")
-        wiki = wiki_filter if "wiki_filter" in globals() else "tewiki"
+        wiki = wiki_filter
 
+        # Load data
         df = load_data(wiki, "reverted_rollback_undo")
         df['Edit_Date'] = pd.to_datetime(df['Edit_Date'], errors='coerce')
         df = df.dropna(subset=['Edit_Date'])
 
-        months = [
-            "January","February","March","April","May","June",
-            "July","August","September","October","November","December"
+        # Filter by selected year & month
+        df_filtered = df[
+            (df['Edit_Date'].dt.year == int(sel_year)) &
+            (df['Edit_Date'].dt.month == month_num)
         ]
 
-        if 'date_filter' in globals() and isinstance(globals()['date_filter'], (list, tuple)):
-            sel_month, sel_year = globals()['date_filter']
-        else:
-            sel_month = months[datetime.date.today().month - 1]
-            sel_year = datetime.date.today().year
-
-        try:
-            month_num = months.index(sel_month) + 1
-        except ValueError:
-            month_num = datetime.date.today().month
-
-        df_filtered = df[(df['Edit_Date'].dt.year == int(sel_year)) & (df['Edit_Date'].dt.month == month_num)]
+        # Count reverted edits per day
         counts = df_filtered.groupby(df_filtered['Edit_Date'].dt.day)['reverted_edits'].sum()
 
+        # Ensure all days of month are represented
         last_day = calendar.monthrange(int(sel_year), month_num)[1]
         all_days = pd.Series(0, index=range(1, last_day + 1))
         counts = all_days.add(counts, fill_value=0).astype(int)
 
-        # Bar plot for reverted edits per day in the selected month
+        # Plot bar chart
         fig, ax = plt.subplots(figsize=(10, 5))
         if counts.max() == 0:
             ax.bar(counts.index, counts.values, color='skyblue', edgecolor='black', alpha=0.7)
             ax.set_ylim(0, 1)
-            ax.text(0.5, 0.5, 'No reverted edits in the selected month', ha='center', va='center', fontsize=12, color='gray', transform=ax.transAxes)
+            ax.text(0.5, 0.5, 'No reverted edits in the selected month',
+                    ha='center', va='center', fontsize=12, color='gray', transform=ax.transAxes)
         else:
             bars = ax.bar(counts.index, counts.values, color='skyblue', edgecolor='black', alpha=0.7)
             for bar, y in zip(bars, counts.values):
                 if y > 0:
-                    ax.text(bar.get_x() + bar.get_width()/2, y/2, str(int(y)), ha='center', va='center', fontsize=13, fontweight='bold', color='black')
+                    ax.text(bar.get_x() + bar.get_width()/2, y/2, str(int(y)),
+                            ha='center', va='center', fontsize=13, fontweight='bold')
+
         ax.set_xlabel('Day of month', fontsize=14)
         ax.set_ylabel('Number of Reverted Edits', fontsize=14)
         ax.set_title(f'Reverted Edits per day in {sel_month} {sel_year}', fontsize=16)
@@ -236,38 +254,32 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
         ax.grid(axis='y', linestyle='--', alpha=0.5)
         st.pyplot(fig, use_container_width=True)
 
+
     with col5:
         st.subheader("Automated edits")
 
-        wiki = wiki_filter if "wiki_filter" in globals() else "tewiki"
+        wiki = wiki_filter
 
+        # Load data
         df = load_data(wiki, "automated_edits")
         df['Edit_Date'] = pd.to_datetime(df['Edit_Date'], errors='coerce')
         df = df.dropna(subset=['Edit_Date'])
 
-        months = [
-            "January","February","March","April","May","June",
-            "July","August","September","October","November","December"
+        # Filter by selected year & month
+        df_filtered = df[
+            (df['Edit_Date'].dt.year == int(sel_year)) &
+            (df['Edit_Date'].dt.month == month_num)
         ]
 
-        if 'date_filter' in globals() and isinstance(globals()['date_filter'], (list, tuple)):
-            sel_month, sel_year = globals()['date_filter']
-        else:
-            sel_month = months[datetime.date.today().month - 1]
-            sel_year = datetime.date.today().year
-
-        try:
-            month_num = months.index(sel_month) + 1
-        except ValueError:
-            month_num = datetime.date.today().month
-
-        df_filtered = df[(df['Edit_Date'].dt.year == int(sel_year)) & (df['Edit_Date'].dt.month == month_num)]
+        # Count automated edits per day
         counts = df_filtered.groupby(df_filtered['Edit_Date'].dt.day)['Automated_Edits'].sum()
 
+        # Ensure all days of month are represented
         last_day = calendar.monthrange(int(sel_year), month_num)[1]
         all_days = pd.Series(0, index=range(1, last_day + 1))
         counts = all_days.add(counts, fill_value=0).astype(int)
 
+        # Plot step chart
         fig, ax = plt.subplots(figsize=(10, 5))
         ax.step(counts.index, counts.values, where='mid', color='blue', linewidth=2)
         ax.set_xlabel('Day of month', fontsize=14)
@@ -279,7 +291,9 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
         ax.grid(axis='y', linestyle='--', alpha=0.5)
 
         for x, y in zip(counts.index, counts.values):
-            ax.text(x, y, str(int(y)), ha='center', va='bottom', color='black', fontsize=11, fontweight='bold')
+            if y > 0:
+                ax.text(x, y, str(int(y)), ha='center', va='bottom',
+                        color='black', fontsize=11, fontweight='bold')
 
         st.pyplot(fig, use_container_width=True)
 
@@ -289,8 +303,7 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
         st.subheader("Editors with at least one edit (rolling YoY)")
 
     # Pick wiki (default = tewiki)
-        wiki = wiki_filter if "wiki_filter" in globals() else "tewiki"
-
+        wiki = wiki_filter
     # Load 1+ edit dataset
         df = load_data(wiki, "editors-activity-1edit")
         df = df.sort_values(by="edit_year")
@@ -320,7 +333,7 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
         st.subheader("Editors with at least 5 edits (rolling YoY)")
 
         # --- Plot for editors with 5+ edits ---
-        wiki = wiki_filter if 'wiki_filter' in globals() else "tewiki"
+        wiki = wiki_filter
 
         df = load_data(wiki, "editors-activity-5edits")
 
@@ -359,8 +372,8 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
     with col11:
         st.subheader("New users activated in the last 30 days")
 
-        # Pick wiki (default = tewiki)
-        wiki = wiki_filter if "wiki_filter" in globals() else "tewiki"
+        
+        wiki = wiki_filter
 
         # Load activation dataset
         df = load_data(wiki, "user-activation")
@@ -420,9 +433,8 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
 
     with col13:
         st.subheader("Editor Distribution by Edit Count Bucket")
-        ## st.write("placeholder")
-        # --- Plot for editors by contribution buckets ---
-        wiki = wiki_filter if "wiki_filter" in globals() else "tewiki"
+        
+        wiki = wiki_filter
 
         df = load_data(wiki, "user-edit-buckets")
 
@@ -498,7 +510,7 @@ def show_contribution_page(wiki_filter, date_filter, date_year):
 
     with col15:
         st.subheader("Top 10 non-bot registered users")
-        wiki = wiki_filter if "wiki_filter" in globals() else "tewiki"
+        wiki = wiki_filter
         df = load_data(wiki, "non-bot-users")
 
         df["month_year"] = pd.to_datetime(df["month_year"], format="%Y-%m")

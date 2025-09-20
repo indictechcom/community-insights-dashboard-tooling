@@ -134,7 +134,6 @@ def show_content_page(date_filter, wiki_filter):
 
         st.pyplot(fig, use_container_width=True)
 
-
     col5, col6 = st.columns(2)
     with col5:
         st.subheader("By platform")
@@ -142,23 +141,15 @@ def show_content_page(date_filter, wiki_filter):
         df_platform = load_data(wiki_filter, "platform")
         df_platform['edit_timestamp'] = pd.to_datetime(df_platform['edit_timestamp'], format='%Y%m%d')
 
-        # Month names same as app.py
+        # Use date_filter from app.py
+        sel_month, sel_year = date_filter  
+
+        # Convert month name to number
         months = [
             "January","February","March","April","May","June",
             "July","August","September","October","November","December"
         ]
-
-        if 'date_filter' in globals() and isinstance(globals()['date_filter'], (list, tuple)):
-            sel_month, sel_year = globals()['date_filter']
-        else:
-            sel_month = months[datetime.date.today().month - 1]
-            sel_year = datetime.date.today().year
-
-        # Convert month name to number
-        try:
-            month_num = months.index(sel_month) + 1
-        except ValueError:
-            month_num = datetime.date.today().month
+        month_num = months.index(sel_month) + 1
 
         # Filter to year + month
         df_filtered = df_platform[
@@ -176,38 +167,22 @@ def show_content_page(date_filter, wiki_filter):
             autopct='%1.1f%%',
             startangle=140
         )
-
-        plt.setp(texts, size=8)       # <-- label size
-        plt.setp(autotexts, size=7) 
+        plt.setp(autotexts, size=8)
         ax.set_title(f"Edit Distribution by Platform - {sel_year}-{month_num:02d}", fontsize=10)
         st.pyplot(fig, use_container_width=False)
 
-        
+
     with col6:
         st.subheader("By tool")
-        
-        # Load tool edits data
-        df_tools = load_data(wiki_filter, "tool")
 
-        # Convert edit_month to datetime
+        df_tools = load_data(wiki_filter, "tool")
         df_tools['edit_month'] = pd.to_datetime(df_tools['edit_month'], format='%Y-%m')
 
-        # Read selected month/year from globals() (already set in app.py as date_filter)
-        if 'date_filter' in globals() and isinstance(globals()['date_filter'], (list, tuple)):
-            sel_month, sel_year = globals()['date_filter']
-        else:
-            months = [
-                "January","February","March","April","May","June",
-                "July","August","September","October","November","December"
-            ]
-            sel_month = months[datetime.date.today().month - 1]
-            sel_year = datetime.date.today().year
+        # Use date_filter from app.py
+        sel_month, sel_year = date_filter  
 
         # Convert month name to number
-        try:
-            month_num = months.index(sel_month) + 1
-        except ValueError:
-            month_num = datetime.date.today().month
+        month_num = months.index(sel_month) + 1
 
         # Filter data for the selected month/year
         df_filtered = df_tools[
@@ -230,6 +205,7 @@ def show_content_page(date_filter, wiki_filter):
             ax.text(i, val, str(val), ha='center', va='bottom', fontsize=10, fontweight='bold')
 
         st.pyplot(fig, use_container_width=True)
+
 
     col7, col8 = st.columns([1,2])
     with col7:
