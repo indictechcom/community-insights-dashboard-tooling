@@ -30,14 +30,27 @@ if category == "Overview":
     st.title("📊 Indic Community Insights Dashboard")
 
     st.markdown("""
-    Welcome to the **Indic Community Insights Dashboard**!
+    Welcome to the *Indic Community Insights Dashboard*!
 
-    This dashboard provides insights into:
-    - **Content** – trends in articles, templates, and growth across Indic Wikipedias
-    - **Contribution** – editor activity and participation metrics
+    Explore activity trends and community growth across *Telugu, Hindi, and Malayalam Wikipedias* with this dashboard:
+    - *Content* – See how articles, templates, and projects are growing.
+    - *Contribution* – Track how editors are participating: edits made, active users, and community engagement.
 
     👉 Use the left sidebar (or the navigation at the top) to explore each section.
     """)
+
+    # Visible but subtle team members section
+    st.markdown("---")
+    st.subheader("Team Members")
+    st.markdown(
+        """
+        <div style='font-size:16px; line-height:1.8; color:#444;'>
+        Usha Kiran Paruchuri &nbsp;|&nbsp; Bhargavi Vyshnavi Kancharla &nbsp;|&nbsp; Venkata Eswar Achi &nbsp;|&nbsp; Pavan Venkata Naga Manoj &nbsp;|&nbsp; Ziyaur Rahaman &nbsp;|&nbsp; Mohan &nbsp;|&nbsp; Shaik Yeswanth
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 elif category == "Content":
     # Call the content component
