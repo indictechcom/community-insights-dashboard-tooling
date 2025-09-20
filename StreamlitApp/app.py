@@ -45,7 +45,7 @@ if category == "Overview":
     st.markdown(
         """
         <div style='font-size:16px; line-height:1.8; color:#444;'>
-        Usha Kiran Paruchuri &nbsp;|&nbsp; Bhargavi Vyshnavi Kancharla &nbsp;|&nbsp; Venkata Eswar Achi &nbsp;|&nbsp; Pavan Venkata Naga Manoj &nbsp;|&nbsp; Ziyaur Rahaman &nbsp;|&nbsp; Mohan &nbsp;|&nbsp; Shaik Yeswanth
+        Usha Kiran Paruchuri &nbsp;|&nbsp; Bhargavi Vyshnavi Kancharla &nbsp;|&nbsp; Venkata Eswar Achi &nbsp;|&nbsp; Pavan Venkata Naga Manoj &nbsp;|&nbsp; Ziyaur Rahaman &nbsp;|&nbsp; Busi Venkata Mohan Reddy &nbsp;|&nbsp; Shaik Yeswanth
         </div>
         """,
         unsafe_allow_html=True
