@@ -1,11 +1,23 @@
-# Daily deletions within a specific window
 SELECT
    CURDATE() AS snapshot_date,
-  DATE(STR_TO_DATE(LEFT(log_timestamp, 8), '%Y%m%d')) AS day,
-  COUNT(*) AS deleted_page_count
-FROM logging
-WHERE log_type = 'delete'
-  AND log_action IN ('delete','delete_redir')
-  AND log_timestamp BETWEEN '20250101000000' AND '20250131235959'
-GROUP BY day
-ORDER BY day;
+   'tewiki' AS wiki_db,
+   DATE(log_timestamp) AS log_date,
+   DATE(ar_timestamp) AS page_creation_date,
+   COUNT(DISTINCT ar_page_id) AS deleted_page_count
+FROM 
+	logging
+JOIN
+	archive
+	ON log_title = ar_title
+    	AND log_timestamp > ar_timestamp
+WHERE 
+	log_type = 'delete'
+  	AND log_action = 'delete'
+    AND ar_parent_id = 0
+    AND ar_namespace = 0
+GROUP BY 
+	snapshot_date,
+    wiki_db,
+    log_date,
+    page_creation_date
+;
