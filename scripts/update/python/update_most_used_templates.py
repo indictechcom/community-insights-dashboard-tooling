@@ -13,8 +13,15 @@ from utils import (
     get_query
 )
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 with open('../../../config.json', 'r') as f:
     config = json.load(f)
+    logger.info("config loaded successfully.")
 
 user_agent = forge.set_user_agent(
     tool=config['user_agent']['tool'],
@@ -25,41 +32,61 @@ user_agent = forge.set_user_agent(
 config_metric_key = 'most_used_templates'
 query_url = config['metric_map'][config_metric_key]['generation_query']
 query = get_query(query_url)
+logger.info("query fetched successfully")
 destination_table = config['metric_map'][config_metric_key]['destination_table']
 databases = config['databases']
 tool_database = config['tool_database']
+logger.info(f"target databases: {databases}")
+logger.info(f"destination table: {destination_table}")
 
 def fetch_data(query, db):
+    logger.info(f"connecting to database: {db}")
     con = forge.connect(db)
     with con.cursor() as cur:
+        logger.info(f"fetching data for {db}")
         cur.execute(query)
         result = cur.fetchall()
         df = pd.DataFrame(result, columns=[col[0] for col in cur.description])
+        logger.info(f"fetched {len(df)} rows for {db}")
     return df
 
 def main():
 
+    logger.info("starting data fetch from wikis")
     df = pd.DataFrame()
     for wiki_db in databases:
+        logger.info(f"processing {wiki_db}")
         wiki_query = query.replace('{DATABASE}', f"'{wiki_db}'")
         wiki_df = fetch_data(wiki_query, wiki_db)
         df = pd.concat([df, wiki_df])
-    df.reset_index(drop=True)
+    df = df.reset_index(drop=True)
 
-    if df is not None:
+    logger.info(f"total rows collected: {len(df)}")
 
+    if not df.empty:
+
+        logger.info(f"connecting to the database of the tool: {tool_database['name']}")
         con = forge.toolsdb(tool_database['name'])
         cur = con.cursor()
 
         try:
+            logger.info(f"clearing destination table: {destination_table}")
             clear_destination_table(destination_table, cur)
+            logger.info(f"inserting {len(df)} rows into {destination_table}")
             update_destination_table(df, destination_table, cur)
             con.commit()
+            logger.info("data update successful")
         except Exception as e:
+            logger.error(f"error updating due to: {e}")
             con.rollback()
+            logger.info("transaction rolled back")
+            raise
         finally:
             cur.close()
             con.close()
+            logger.info("database connection closed")
+    else:
+        logger.warning("dataframe is empty")
 
 if __name__ == "__main__":
     main()
