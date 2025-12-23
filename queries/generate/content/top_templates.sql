@@ -1,11 +1,20 @@
-# Top 25 most used templates
 SELECT 
-    p.page_title AS template_name,  
-    COUNT(*) AS usage_count         
-FROM templatelinks tl
-JOIN page p 
-    ON tl.tl_target_id = p.page_id  
-WHERE p.page_namespace = 10         
-GROUP BY p.page_title               
-ORDER BY usage_count DESC          
-LIMIT 25; 
+    CURDATE() AS snapshot_date,
+    'tewiki' AS wiki_db,
+    target.lt_title AS template,
+    COUNT(*) AS transclusion_count
+FROM 
+	templatelinks tl
+JOIN 
+	linktarget target
+    ON tl.tl_target_id = target.lt_id
+WHERE
+	tl_from_namespace = 0
+	AND target.lt_namespace = 10
+ GROUP BY
+ 	snapshot_date,
+    wiki_db,
+    template
+ORDER BY
+	transclusion_count DESC
+; 

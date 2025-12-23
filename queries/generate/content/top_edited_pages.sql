@@ -8,5 +8,5 @@ SELECT
 FROM revision r
 JOIN page p ON r.rev_page = p.page_id
 WHERE p.page_namespace = 0
-GROUP BY edit_date, p.page_id, p.page_title
+GROUP BY snapshot_date, wiki_db, edit_date, p.page_id, p.page_title
 ;
