@@ -48,7 +48,7 @@ def main():
 
     if df is not None:
 
-        con = forge.toolsdb(tool_database)
+        con = forge.toolsdb(tool_database['name'])
         cur = con.cursor()
 
         try:
