@@ -26,7 +26,7 @@ def update_destination_table(df: pd.DataFrame, table: str, cur) -> None:
     for _, row in df.iterrows():
         cur.execute(
             f"""
-            INSERT INTO {table} ({col_names})
+            REPLACE INTO {table} ({col_names})
             VALUES ({placeholders})
         """,
             tuple(row.values),
