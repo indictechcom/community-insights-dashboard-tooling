@@ -1,5 +1,8 @@
 from datetime import datetime, timezone
 import urllib.request
+import logging
+from logging.handlers import RotatingFileHandler
+import os
 
 import pandas as pd
 
@@ -65,3 +68,30 @@ def sql_tuple(i):
 def get_query(url):
     with urllib.request.urlopen(url) as response:
         return response.read().decode()
+
+def setup_logging(script_name, max_bytes=10*1024*1024, backup_count=5):
+    log_dir = os.path.join(os.path.dirname(__file__), '../../../logs')
+    os.makedirs(log_dir, exist_ok=True)
+
+    log_file = os.path.join(log_dir, f'{script_name}.log')
+
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+    file_handler = RotatingFileHandler(
+        log_file,
+        maxBytes=max_bytes,
+        backupCount=backup_count
+    )
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
+
+    logger = logging.getLogger(script_name)
+    logger.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    return logger

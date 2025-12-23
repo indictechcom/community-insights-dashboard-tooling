@@ -4,20 +4,16 @@ import pandas as pd
 import toolforge as forge
 
 import os
-import logging
 
 from utils import (
     clear_destination_table,
     update_destination_table,
     sql_tuple,
-    get_query
+    get_query,
+    setup_logging
 )
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+logger = setup_logging('update_most_used_templates')
 
 with open('../../../config.json', 'r') as f:
     config = json.load(f)
