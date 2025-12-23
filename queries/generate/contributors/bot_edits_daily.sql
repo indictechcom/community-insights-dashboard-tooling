@@ -1,27 +1,33 @@
 WITH bot_edits AS (
   SELECT
-  	DATE(rev_timestamp) AS rev_date,
-  	rev_id
+    CURDATE() AS snapshot_date,
+    'tewiki' AS wiki_db,
+    DATE(rev_timestamp) AS edit_date,
+    rev_id
   FROM
-  	revision r
+    revision r
   JOIN
-	actor a
-  	ON r.rev_actor = a.actor_id
+    actor a
+    ON r.rev_actor = a.actor_id
   JOIN
-  	user u
-  	ON a.actor_id = u.user_id
+    user u
+    ON a.actor_id = u.user_id
   JOIN
-  	user_groups ug
-  	On u.user_id = ug.ug_user
+    user_groups ug
+    ON u.user_id = ug.ug_user
   WHERE
-  	ug_group = 'bot'
+    ug_group = 'bot'
 )
 
 SELECT
-	rev_date,
-    COUNT(DISTINCT rev_id) AS automated_edit_count
+  snapshot_date,
+  wiki_db,
+  edit_date,
+  COUNT(DISTINCT rev_id) AS edit_count
 FROM
-	bot_edits
+  bot_edits
 GROUP BY
-	rev_date
+  snapshot_date,
+  wiki_db,
+  edit_date
 ;

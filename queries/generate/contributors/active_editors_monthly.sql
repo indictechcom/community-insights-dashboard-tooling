@@ -5,17 +5,24 @@ SELECT
     edit_year, '-',
     IF(edit_month < 10, CONCAT('0', edit_month), edit_month),
     '-01'
-  ) AS month_start,
-  COUNT(DISTINCT actor_user) AS active_editors
+  ) AS month,
+  COUNT(DISTINCT actor_user) AS active_editor_count
 FROM (
   SELECT
-    YEAR(r.rev_timestamp)  AS edit_year,
+    YEAR(r.rev_timestamp) AS edit_year,
     MONTH(r.rev_timestamp) AS edit_month,
     a.actor_user
-  FROM revision r
-  JOIN page  p ON p.page_id = r.rev_page
-  JOIN actor a ON a.actor_id = r.rev_actor
-  JOIN user  u ON u.user_id = a.actor_user
+  FROM
+    revision r
+  JOIN
+    page p
+    ON p.page_id = r.rev_page
+  JOIN
+    actor a
+    ON a.actor_id = r.rev_actor
+  JOIN
+    user u
+    ON u.user_id = a.actor_user
   WHERE
     p.page_namespace = 0
     AND a.actor_user IS NOT NULL
@@ -30,7 +37,8 @@ FROM (
     YEAR(r.rev_timestamp),
     MONTH(r.rev_timestamp),
     a.actor_user
-  HAVING COUNT(*) >= 5
+  HAVING
+    COUNT(*) >= 5
 ) AS filtered_editors
 GROUP BY
   CONCAT(
@@ -39,4 +47,5 @@ GROUP BY
     '-01'
   )
 ORDER BY
-  month_start;
+  month
+;

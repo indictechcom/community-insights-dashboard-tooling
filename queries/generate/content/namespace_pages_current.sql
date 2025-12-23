@@ -7,14 +7,14 @@ SELECT
     WHEN 10 THEN 'template'
     WHEN 14 THEN 'category'
     WHEN 118 THEN 'draft'
-  END AS ns,
+  END AS namespace,
   COUNT(*) AS page_count
-FROM 
-	page p
-WHERE 
-	p.page_namespace IN (0, 6, 10, 14, 118)
-GROUP BY 
-	p.page_namespace
+FROM
+  page p
+WHERE
+  p.page_namespace IN (0, 6, 10, 14, 118)
+GROUP BY
+  p.page_namespace
 ORDER BY
   CASE p.page_namespace
     WHEN 0 THEN 1
@@ -23,4 +23,4 @@ ORDER BY
     WHEN 14 THEN 4
     WHEN 118 THEN 5
   END
- ;
+;
