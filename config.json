@@ -1,0 +1,22 @@
+{
+    "databases": [
+        "hiwiki",
+        "tewiki",
+        "mlwiki"
+    ],
+    "metric_map": {
+        "most_used_templates": {
+            "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/most_used_templates_current.sql",
+            "destination_table": "most_used_templates_current"
+        }
+    },
+    "user_agent": {
+        "tool": "Indic Wikimedia Community Insights Dashboard",
+        "url": "https://github.com/indictechcom/community-insights-dashboard-tooling",
+        "email": ""
+    },
+    "tool_database": {
+        "name": "s57262__indic_community_insights_p",
+        "host": "tools.db.svc.wikimedia.cloud"
+    }
+}

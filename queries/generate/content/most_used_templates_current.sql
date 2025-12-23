@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   target.lt_title AS template,
   COUNT(*) AS transclusion_count
 FROM
@@ -17,4 +17,5 @@ GROUP BY
   template
 ORDER BY
   transclusion_count DESC
-; 
+LIMIT 100
+;
