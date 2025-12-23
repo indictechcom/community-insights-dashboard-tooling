@@ -1,8 +1,10 @@
 #!/bin/bash
 
-CNF_PATH="$HOME/replica.my.cnf"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-SQL_FILE="$HOME/www/python/src/queries/create/content/create_most_used_templates.sql"
+CNF_PATH="$HOME/replica.my.cnf"
+SQL_FILE="$REPO_ROOT/queries/create/content/create_most_used_templates.sql"
 
 DATABASE="s57262__indic_community_insights_p"
 HOST="tools.db.svc.wikimedia.cloud"
