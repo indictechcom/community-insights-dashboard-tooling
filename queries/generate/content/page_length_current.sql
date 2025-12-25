@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   CASE
     WHEN page_namespace = 0 THEN 'article'
     WHEN page_namespace = 1 THEN 'article_talk'

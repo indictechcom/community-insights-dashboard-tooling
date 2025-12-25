@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   DATE(r.rev_timestamp) AS edit_date,
   CASE p.page_namespace
     WHEN 1 THEN 'article_talk'

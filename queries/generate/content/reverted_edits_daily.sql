@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   DATE(rev_timestamp) AS edit_date,
   COUNT(DISTINCT rev_id) AS reverted_edit_count
 FROM

@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   CASE p.page_namespace
     WHEN 0 THEN 'main'
     WHEN 6 THEN 'file'

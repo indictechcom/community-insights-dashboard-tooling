@@ -1,7 +1,7 @@
 WITH bot_edits AS (
   SELECT
     CURDATE() AS snapshot_date,
-    'tewiki' AS wiki_db,
+    {DATABASE} AS wiki_db,
     DATE(rev_timestamp) AS edit_date,
     rev_id
   FROM

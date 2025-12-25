@@ -33,7 +33,7 @@ user_edits_24h AS (
 )
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   DATE_SUB(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH) AS month,
   COUNT(*) AS total_new_user_count,
   SUM(edits_24h_ns0 >= 1) AS activated_editor_count_1e,

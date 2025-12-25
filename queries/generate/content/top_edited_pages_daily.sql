@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   DATE(r.rev_timestamp) AS edit_date,
   p.page_id,
   p.page_title,

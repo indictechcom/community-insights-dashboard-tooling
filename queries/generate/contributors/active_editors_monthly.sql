@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   CONCAT(
     edit_year, '-',
     IF(edit_month < 10, CONCAT('0', edit_month), edit_month),

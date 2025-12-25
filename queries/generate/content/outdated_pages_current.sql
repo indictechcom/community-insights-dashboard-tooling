@@ -22,7 +22,7 @@ WITH page_revisions AS (
 )
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   namespace,
   COUNT(*) AS total_page_count,
   SUM(CASE WHEN rev_count = 1 THEN 1 ELSE 0 END) AS outdated_page_count,

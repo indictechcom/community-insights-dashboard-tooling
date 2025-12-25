@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   DATE(user_registration) AS registration_date,
   COUNT(DISTINCT user_id) AS user_count
 FROM

@@ -1,7 +1,7 @@
 WITH bucketing AS (
   SELECT
     CURDATE() AS snapshot_date,
-    'tewiki' AS wiki_db,
+    {DATABASE} AS wiki_db,
     user_id,
     CASE
       WHEN user_editcount = 0 THEN '0'

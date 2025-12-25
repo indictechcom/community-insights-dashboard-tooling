@@ -41,6 +41,10 @@
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/top_edited_pages_daily.sql",
             "destination_table": "top_edited_pages_daily"
         },
+        "user_edits": {
+            "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/user_edits_daily.sql",
+            "destination_table": "user_edits_daily"
+        },
         "account_registrations": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/account_registrations_daily.sql",
             "destination_table": "account_registrations_daily"

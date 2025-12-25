@@ -1,6 +1,6 @@
 SELECT
   CURDATE() AS snapshot_date,
-  'tewiki' AS wiki_db,
+  {DATABASE} AS wiki_db,
   DATE(log_timestamp) AS deletion_date,
   DATE(ar_timestamp) AS page_creation_date,
   COUNT(DISTINCT ar_page_id) AS deleted_page_count
