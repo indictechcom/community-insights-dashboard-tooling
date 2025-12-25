@@ -37,11 +37,10 @@ tool_database = config['tool_database']
 logger.info(f'target databases: {databases}')
 logger.info(f'destination table: {destination_table}')
 
-def fetch_data(query, db, timeout=300):
+def fetch_data(query, db):
     logger.info(f'connecting to database: {db}')
     con = forge.connect(db)
     with con.cursor() as cur:
-        cur.execute(f"SET SESSION max_execution_time={timeout * 1000}")
         logger.info(f'fetching data for {db}')
         cur.execute(query)
         result = cur.fetchall()
