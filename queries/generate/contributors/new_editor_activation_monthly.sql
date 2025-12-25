@@ -16,9 +16,10 @@ new_users AS (
     AND u.user_registration < dp.month_end
     AND u.user_registration IS NOT NULL
 ),
-activated_users AS (
-  SELECT DISTINCT
-    nu.user_id
+user_edit_counts AS (
+  SELECT
+    nu.user_id,
+    COUNT(r.rev_id) AS edit_count
   FROM
     new_users nu
   JOIN
@@ -31,15 +32,19 @@ activated_users AS (
     p.page_namespace = 0
     AND r.rev_timestamp >= nu.user_registration
     AND r.rev_timestamp < nu.reg_plus_24h
+  GROUP BY
+    nu.user_id
 )
 SELECT
   CURDATE() AS snapshot_date,
   {DATABASE} AS wiki_db,
   DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01') AS month,
-  COUNT(DISTINCT nu.user_id) AS total_new_users,
-  COUNT(DISTINCT au.user_id) AS users_with_ns0_edits_24h,
-  ROUND(100 * COUNT(DISTINCT au.user_id) / COUNT(DISTINCT nu.user_id), 2) AS activation_rate
+  COUNT(DISTINCT nu.user_id) AS total_new_user_count,
+  COUNT(DISTINCT CASE WHEN uec.edit_count >= 1 THEN uec.user_id END) AS activated_editor_count_1e,
+  COUNT(DISTINCT CASE WHEN uec.edit_count >= 5 THEN uec.user_id END) AS activated_editor_count_5e,
+  ROUND(100 * COUNT(DISTINCT CASE WHEN uec.edit_count >= 1 THEN uec.user_id END) / COUNT(DISTINCT nu.user_id), 2) AS activated_editor_pct_1e,
+  ROUND(100 * COUNT(DISTINCT CASE WHEN uec.edit_count >= 5 THEN uec.user_id END) / COUNT(DISTINCT nu.user_id), 2) AS activated_editor_pct_5e
 FROM
   new_users nu
-  LEFT JOIN activated_users au ON au.user_id = nu.user_id
+  LEFT JOIN user_edit_counts uec ON uec.user_id = nu.user_id
 ;
