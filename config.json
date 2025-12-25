@@ -38,8 +38,8 @@
             "destination_table": "revisions_by_interface_daily"
         },
         "top_edited_pages": {
-            "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/top_edited_pages_daily.sql",
-            "destination_table": "top_edited_pages_daily"
+            "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/top_edited_pages_monthly.sql",
+            "destination_table": "top_edited_pages_monthly"
         },
         "user_edits": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/user_edits_daily.sql",
