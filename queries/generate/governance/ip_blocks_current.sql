@@ -29,6 +29,6 @@ WHERE
 	bt.bt_user IS NULL
   	AND (bt.bt_ip_hex != 0 OR bt.bt_range_start != 0)
   	AND (b.bl_expiry = 'infinity' OR b.bl_expiry > NOW())
-ORDER BY 
-	b.bl_timestamp'
+ORDER BY
+	b.bl_timestamp
 ;
