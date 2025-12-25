@@ -10,7 +10,9 @@ from utils import (
     update_destination_table,
     sql_tuple,
     get_query,
-    setup_logging
+    setup_logging,
+    validate_data,
+    validate_schema
 )
 
 logger = setup_logging('update_thank_log')
@@ -35,10 +37,11 @@ tool_database = config['tool_database']
 logger.info(f'target databases: {databases}')
 logger.info(f'destination table: {destination_table}')
 
-def fetch_data(query, db):
+def fetch_data(query, db, timeout=300):
     logger.info(f'connecting to database: {db}')
     con = forge.connect(db)
     with con.cursor() as cur:
+        cur.execute(f"SET SESSION max_execution_time={timeout * 1000}")
         logger.info(f'fetching data for {db}')
         cur.execute(query)
         result = cur.fetchall()
@@ -66,8 +69,8 @@ def main():
         cur = con.cursor()
 
         try:
-            logger.info(f'clearing destination table: {destination_table}')
-            clear_destination_table(destination_table, cur)
+            validate_data(df, config_metric_key)
+            validate_schema(df, destination_table, cur)
             logger.info(f'inserting {len(df)} rows into {destination_table}')
             update_destination_table(df, destination_table, cur)
             con.commit()

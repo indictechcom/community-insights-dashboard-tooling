@@ -74,6 +74,7 @@ def setup_logging(script_name, max_bytes=10*1024*1024, backup_count=5):
     os.makedirs(log_dir, exist_ok=True)
 
     log_file = os.path.join(log_dir, f'{script_name}.log')
+    master_log = os.path.join(log_dir, 'master.log')
 
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
@@ -85,6 +86,14 @@ def setup_logging(script_name, max_bytes=10*1024*1024, backup_count=5):
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
 
+    master_handler = RotatingFileHandler(
+        master_log,
+        maxBytes=max_bytes,
+        backupCount=backup_count
+    )
+    master_handler.setLevel(logging.INFO)
+    master_handler.setFormatter(formatter)
+
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
@@ -92,6 +101,38 @@ def setup_logging(script_name, max_bytes=10*1024*1024, backup_count=5):
     logger = logging.getLogger(script_name)
     logger.setLevel(logging.INFO)
     logger.addHandler(file_handler)
+    logger.addHandler(master_handler)
     logger.addHandler(console_handler)
 
     return logger
+
+
+def validate_data(df, metric_name, min_rows=1):
+    if df.empty:
+        raise ValueError(f"{metric_name}: dataframe is empty")
+
+    row_count = len(df)
+    if row_count < min_rows:
+        raise ValueError(f"{metric_name}: too few rows ({row_count} < {min_rows})")
+
+    null_cols = df.columns[df.isnull().all()].tolist()
+    if null_cols:
+        raise ValueError(f"{metric_name}: all-null columns: {null_cols}")
+
+    return True
+
+
+def validate_schema(df, table, cur):
+    cur.execute(f"DESCRIBE {table}")
+    table_cols = {row[0] for row in cur.fetchall()}
+    df_cols = set(df.columns)
+
+    missing = table_cols - df_cols
+    extra = df_cols - table_cols
+
+    if missing:
+        raise ValueError(f"missing columns in data: {missing}")
+    if extra:
+        raise ValueError(f"extra columns in data: {extra}")
+
+    return True
