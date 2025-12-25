@@ -76,6 +76,10 @@
         "user_groups": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/governance/user_groups_current.sql",
             "destination_table": "user_groups_current"
+        },
+        "ip_blocks": {
+            "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/governance/ip_blocks_current.sql",
+            "destination_table": "ip_blocks_current"
         }
     },
     "user_agent": {
