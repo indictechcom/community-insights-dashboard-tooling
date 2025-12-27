@@ -28,7 +28,6 @@ WITH edits AS (
     ON u.user_id = ug.ug_user
   WHERE
     (ug_group != 'bot' OR ug_group IS NULL)
-    AND rev_parent_id != 0
 ),
 
 tags AS (

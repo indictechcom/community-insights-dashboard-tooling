@@ -26,7 +26,7 @@ FROM (
   WHERE
     p.page_namespace = 0
     AND a.actor_user IS NOT NULL
-    AND r.rev_timestamp >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    AND r.rev_timestamp >= '20150101000000'
     AND NOT EXISTS (
       SELECT 1
       FROM user_groups ug
