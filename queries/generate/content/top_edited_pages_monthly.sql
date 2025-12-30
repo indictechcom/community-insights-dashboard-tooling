@@ -1,6 +1,6 @@
 WITH monthly_edits AS (
   SELECT
-    DATE_FORMAT(r.rev_timestamp, '%Y-%m-01') AS edit_month,
+    DATE_FORMAT(r.rev_timestamp, '%Y-%m-01') AS month,
     p.page_id,
     p.page_title,
     COUNT(DISTINCT r.rev_id) AS edit_count
@@ -12,24 +12,24 @@ WITH monthly_edits AS (
     p.page_namespace = 0
     AND r.rev_timestamp >= '20150101000000'
   GROUP BY
-    edit_month,
+    month,
     p.page_id,
     p.page_title
 ),
 ranked_pages AS (
   SELECT
-    edit_month,
+    month,
     page_id,
     page_title,
     edit_count,
-    ROW_NUMBER() OVER (PARTITION BY edit_month ORDER BY edit_count DESC) AS page_rank
+    ROW_NUMBER() OVER (PARTITION BY month ORDER BY edit_count DESC) AS page_rank
   FROM
     monthly_edits
 )
 SELECT
   CURDATE() AS snapshot_date,
   {DATABASE} AS wiki_db,
-  edit_month,
+  month,
   page_id,
   page_title,
   edit_count,
@@ -39,6 +39,6 @@ FROM
 WHERE
   page_rank <= 10
 ORDER BY
-  edit_month,
+  month,
   page_rank
 ;

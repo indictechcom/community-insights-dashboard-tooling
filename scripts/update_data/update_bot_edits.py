@@ -71,7 +71,7 @@ def main():
             validate_data(df, config_metric_key)
             validate_schema(df, destination_table, cur)
             logger.info(f'inserting {len(df)} rows into {destination_table}')
-            update_destination_table(df, destination_table, cur)
+            update_destination_table(df, destination_table, cur, config['metric_map'][config_metric_key])
             con.commit()
             logger.info('data update successful')
         except Exception as e:

@@ -1,7 +1,7 @@
 SELECT
   CURDATE() AS snapshot_date,
   {DATABASE} AS wiki_db,
-  DATE(rev_timestamp) AS edit_date,
+  DATE(rev_timestamp) AS date,
   COUNT(DISTINCT rev_id) AS reverted_edit_count
 FROM
   revision r
@@ -20,9 +20,9 @@ WHERE
 GROUP BY
   snapshot_date,
   wiki_db,
-  edit_date
+  date
 ORDER BY
   snapshot_date,
   wiki_db,
-  edit_date
+  date
 ;

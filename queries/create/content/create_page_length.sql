@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS page_length_current (
     `page_id`               BIGINT          ,
     `page_title`            VARCHAR(255)    ,
     `page_len`              BIGINT          ,
-    PRIMARY KEY (`wiki_db`, `page_id`, `snapshot_date`)
+    `is_latest`             BOOLEAN         NOT NULL DEFAULT TRUE,
+    PRIMARY KEY (`wiki_db`, `page_id`, `snapshot_date`),
+    INDEX idx_latest (`is_latest`)
 )
 ENGINE=InnoDB
 ;

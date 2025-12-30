@@ -2,7 +2,7 @@ WITH edits AS (
   SELECT
     CURDATE() AS snapshot_date,
     {DATABASE} AS wiki_db,
-    DATE(rev_timestamp) AS edit_date,
+    DATE(rev_timestamp) AS date,
     rev_id,
     CASE
       WHEN page_namespace = 0 THEN TRUE
@@ -60,7 +60,7 @@ tags AS (
 SELECT
   snapshot_date,
   wiki_db,
-  edit_date,
+  date,
   is_main_ns,
   is_page_creation,
   edit_interface,
@@ -70,7 +70,7 @@ FROM
 GROUP BY
   snapshot_date,
   wiki_db,
-  edit_date,
+  date,
   is_main_ns,
   is_page_creation,
   edit_interface

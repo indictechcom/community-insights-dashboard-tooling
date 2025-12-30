@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS user_groups_current (
     `wiki_db`               VARCHAR(255)    ,
     `user_right`            VARCHAR(255)    ,
     `user_count`            BIGINT          ,
-    PRIMARY KEY (`wiki_db`, `user_right`, `snapshot_date`)
+    `is_latest`             BOOLEAN         NOT NULL DEFAULT TRUE,
+    PRIMARY KEY (`wiki_db`, `user_right`, `snapshot_date`),
+    INDEX idx_latest (`is_latest`)
 )
 ENGINE=InnoDB
 ;

@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS new_editor_activation_monthly (
     `activated_editor_count_5e`     BIGINT          ,
     `activated_editor_pct_1e`       DECIMAL(5,2)    ,
     `activated_editor_pct_5e`       DECIMAL(5,2)    ,
-    PRIMARY KEY (`wiki_db`, `month`, `snapshot_date`)
+    `is_latest`                     BOOLEAN         NOT NULL DEFAULT TRUE,
+    PRIMARY KEY (`wiki_db`, `month`, `snapshot_date`),
+    INDEX idx_latest (`is_latest`)
 )
 ENGINE=InnoDB
 ;

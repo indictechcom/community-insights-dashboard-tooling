@@ -1,7 +1,7 @@
 SELECT
   CURDATE() AS snapshot_date,
   {DATABASE} AS wiki_db,
-  DATE(user_registration) AS registration_date,
+  DATE(user_registration) AS date,
   COUNT(DISTINCT user_id) AS user_count
 FROM
   user u
@@ -14,5 +14,5 @@ WHERE
 GROUP BY
   snapshot_date,
   wiki_db,
-  registration_date
+  date
 ;

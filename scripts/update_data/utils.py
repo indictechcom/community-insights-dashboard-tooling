@@ -20,7 +20,30 @@ def to_mysql_ts(ts):
         return None
 
 
-def update_destination_table(df: pd.DataFrame, table: str, cur) -> None:
+def update_destination_table(df: pd.DataFrame, table: str, cur, metric_config: dict = None) -> None:
+
+    if metric_config:
+        update_mode = metric_config.get('update_mode', 'replace_all')
+
+        if update_mode == 'replace_all':
+            cur.execute(f"UPDATE {table} SET is_latest = FALSE WHERE is_latest = TRUE")
+
+        elif update_mode == 'append_period':
+            if table.endswith('_monthly'):
+                period_col = 'month'
+            elif table.endswith('_daily'):
+                period_col = 'date'
+            else:
+                period_col = 'date'
+
+            if period_col in df.columns:
+                periods = tuple(df[period_col].unique())
+                if len(periods) == 1:
+                    cur.execute(f"UPDATE {table} SET is_latest = FALSE WHERE {period_col} = %s AND is_latest = TRUE", periods)
+                else:
+                    cur.execute(f"UPDATE {table} SET is_latest = FALSE WHERE {period_col} IN {sql_tuple(periods)} AND is_latest = TRUE")
+
+    df['is_latest'] = True
 
     columns = df.columns.tolist()
     placeholders = ", ".join(["%s"] * len(columns))

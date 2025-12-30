@@ -1,7 +1,7 @@
 SELECT
   CURDATE() AS snapshot_date,
   {DATABASE} AS wiki_db,
-  DATE(r.rev_timestamp) AS edit_date,
+  DATE(r.rev_timestamp) AS date,
   CASE p.page_namespace
     WHEN 1 THEN 'article_talk'
     WHEN 3 THEN 'user_talk'
@@ -19,6 +19,6 @@ GROUP BY
   DATE(r.rev_timestamp),
   p.page_namespace
 ORDER BY
-  edit_date,
+  date,
   namespace
 ;

@@ -5,7 +5,7 @@ SELECT
     	WHEN actor_user IS NULL THEN TRUE
         ELSE FALSE
     END AS is_anon,
-    DATE(rev_timestamp) AS rev_date,
+    DATE(rev_timestamp) AS date,
     COUNT(DISTINCT rev_id) AS edit_count
 FROM
 	revision r
@@ -28,6 +28,6 @@ WHERE
 GROUP BY
 	snapshot_date,
     wiki_db,
-    rev_date,
+    date,
     is_anon
 ;

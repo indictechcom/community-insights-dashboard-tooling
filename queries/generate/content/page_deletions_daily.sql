@@ -1,7 +1,7 @@
 SELECT
   CURDATE() AS snapshot_date,
   {DATABASE} AS wiki_db,
-  DATE(log_timestamp) AS deletion_date,
+  DATE(log_timestamp) AS date,
   DATE(ar_timestamp) AS page_creation_date,
   COUNT(DISTINCT ar_page_id) AS deleted_page_count
 FROM
@@ -18,6 +18,6 @@ WHERE
 GROUP BY
   snapshot_date,
   wiki_db,
-  deletion_date,
+  date,
   page_creation_date
 ;

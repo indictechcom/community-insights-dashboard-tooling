@@ -2,7 +2,7 @@ WITH bot_edits AS (
   SELECT
     CURDATE() AS snapshot_date,
     {DATABASE} AS wiki_db,
-    DATE(rev_timestamp) AS edit_date,
+    DATE(rev_timestamp) AS date,
     rev_id
   FROM
     revision r
@@ -22,12 +22,12 @@ WITH bot_edits AS (
 SELECT
   snapshot_date,
   wiki_db,
-  edit_date,
+  date,
   COUNT(DISTINCT rev_id) AS edit_count
 FROM
   bot_edits
 GROUP BY
   snapshot_date,
   wiki_db,
-  edit_date
+  date
 ;
