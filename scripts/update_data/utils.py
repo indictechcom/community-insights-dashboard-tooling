@@ -88,13 +88,25 @@ def sql_tuple(i):
     list_repr = repr(i)
     return "(" + list_repr[1:-1] + ")"
 
-def get_query(url):
-    with urllib.request.urlopen(url) as response:
-        return response.read().decode()
+def get_query(url, user_agent_config=None):
+    if user_agent_config:
+        user_agent = f"{user_agent_config['tool']} ({user_agent_config['url']}; {user_agent_config.get('email', '')})"
+        req = urllib.request.Request(
+            url, 
+            data=None, 
+            headers={
+                'User-Agent': user_agent
+            }
+        )
+        with urllib.request.urlopen(req) as response:
+            return response.read().decode()
+    else:
+        with urllib.request.urlopen(url) as response:
+            return response.read().decode()
 
 def setup_logging(script_name, max_bytes=10*1024*1024, backup_count=5):
     log_dir = os.path.join(os.path.dirname(__file__), '../../logs')
-    os.makedirs(log_dir, exist_ok=True)
+    os.makedirs(log_dir, exist_ok=True) 
 
     log_file = os.path.join(log_dir, f'{script_name}.log')
     master_log = os.path.join(log_dir, 'master.log')

@@ -1,4 +1,4 @@
-{
+{   
     "databases": [
         "hiwiki",
         "tewiki",
@@ -109,5 +109,8 @@
     "tool_database": {
         "name": "s57262__indic_community_insights_p",
         "host": "tools.db.svc.wikimedia.cloud"
-    }
+    },
+    "projects": 
+        ["hi.wikipedia.org", "ml.wikipedia.org", "te.wikipedia.org"]
+    
 }
