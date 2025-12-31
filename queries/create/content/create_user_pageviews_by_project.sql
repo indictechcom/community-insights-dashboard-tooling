@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS user_pageviews_by_project (
+CREATE TABLE IF NOT EXISTS user_pageviews_by_project_daily (
     `snapshot_date`         DATE            ,
     `wiki_db`               VARCHAR(255)    ,
     `access_type`           VARCHAR(255)         ,
