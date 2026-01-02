@@ -50,17 +50,19 @@ def fetch_wiki_data(query: str, databases: List[str], logger) -> pd.DataFrame:
     return df
 
 
-def insert_data(df: pd.DataFrame, metric_key: str, destination_table: str, tool_database: Dict[str, str], config: Dict[str, Any], logger) -> None:
+def insert_data(df: pd.DataFrame, metric_key: str, destination_table: str, tool_database: Dict[str, str], config: Dict[str, Any], logger, display_name: str = None) -> None:
     if df.empty:
         logger.warning('dataframe is empty')
         return
+
+    validation_name = display_name if display_name else metric_key
 
     logger.info(f'connecting to the database of the tool: {tool_database["name"]}')
     con = forge.toolsdb(tool_database['name'])
     cur = con.cursor()
 
     try:
-        validate_data(df, metric_key)
+        validate_data(df, validation_name)
         validate_schema(df, destination_table, cur)
         logger.info(f'inserting {len(df)} rows into {destination_table}')
         update_destination_table(df, destination_table, cur, config['metric_map'][metric_key])

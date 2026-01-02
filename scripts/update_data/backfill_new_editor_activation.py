@@ -77,7 +77,7 @@ def main():
 
         if not df.empty:
             try:
-                insert_data(df, f"{metric_key}_{month_start.strftime('%Y-%m')}", destination_table, tool_database, config, logger)
+                insert_data(df, metric_key, destination_table, tool_database, config, logger, display_name=f"{metric_key}_{month_start.strftime('%Y-%m')}")
                 logger.info(f'successfully inserted data for {month_start.strftime("%Y-%m")}')
             except Exception as e:
                 logger.error(f'error updating {month_start.strftime("%Y-%m")}: {e}')
