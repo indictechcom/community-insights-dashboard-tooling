@@ -42,8 +42,8 @@ SELECT
   COUNT(DISTINCT nu.user_id) AS total_new_user_count,
   COUNT(DISTINCT CASE WHEN uec.edit_count >= 1 THEN uec.user_id END) AS activated_editor_count_1e,
   COUNT(DISTINCT CASE WHEN uec.edit_count >= 5 THEN uec.user_id END) AS activated_editor_count_5e,
-  ROUND(100 * COUNT(DISTINCT CASE WHEN uec.edit_count >= 1 THEN uec.user_id END) / COUNT(DISTINCT nu.user_id), 2) AS activated_editor_pct_1e,
-  ROUND(100 * COUNT(DISTINCT CASE WHEN uec.edit_count >= 5 THEN uec.user_id END) / COUNT(DISTINCT nu.user_id), 2) AS activated_editor_pct_5e
+  ROUND(COUNT(DISTINCT CASE WHEN uec.edit_count >= 1 THEN uec.user_id END) / COUNT(DISTINCT nu.user_id), 4) AS activated_editor_pct_1e,
+  ROUND(COUNT(DISTINCT CASE WHEN uec.edit_count >= 5 THEN uec.user_id END) / COUNT(DISTINCT nu.user_id), 4) AS activated_editor_pct_5e
 FROM
   new_users nu
   LEFT JOIN user_edit_counts uec ON uec.user_id = nu.user_id

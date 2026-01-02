@@ -8,97 +8,97 @@
         "most_used_templates": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/most_used_templates_current.sql",
             "destination_table": "most_used_templates_current",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "namespace_pages": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/namespace_pages_current.sql",
             "destination_table": "namespace_pages_current",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "outdated_pages": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/outdated_pages_current.sql",
             "destination_table": "outdated_pages_current",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "page_deletions": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/page_deletions_daily.sql",
             "destination_table": "page_deletions_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "page_length": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/page_length_current.sql",
             "destination_table": "page_length_current",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "reverted_edits": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/reverted_edits_daily.sql",
             "destination_table": "reverted_edits_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "reverts": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/reverts_daily.sql",
             "destination_table": "reverts_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "revisions_by_interface": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/revisions_by_interface_daily.sql",
             "destination_table": "revisions_by_interface_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "top_edited_pages": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/top_edited_pages_monthly.sql",
             "destination_table": "top_edited_pages_monthly",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "user_edits": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/user_edits_daily.sql",
             "destination_table": "user_edits_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "account_registrations": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/account_registrations_daily.sql",
             "destination_table": "account_registrations_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "active_editors": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/active_editors_monthly.sql",
             "destination_table": "active_editors_monthly",
-            "update_mode": "append_period"
+            "update_mode": "incremental"
         },
         "bot_edits": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/bot_edits_daily.sql",
             "destination_table": "bot_edits_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "new_editor_activation": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/new_editor_activation_monthly.sql",
             "destination_table": "new_editor_activation_monthly",
-            "update_mode": "append_period"
+            "update_mode": "incremental"
         },
         "talk_page_activity": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/talk_page_activity_daily.sql",
             "destination_table": "talk_page_activity_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "thank_log": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/thank_log_daily.sql",
             "destination_table": "thank_log_daily",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "user_by_editcount_bucket": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/user_by_editcount_bucket_current.sql",
             "destination_table": "user_by_editcount_bucket_current",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "user_groups": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/governance/user_groups_current.sql",
             "destination_table": "user_groups_current",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         },
         "ip_blocks": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/governance/ip_blocks_current.sql",
             "destination_table": "ip_blocks_current",
-            "update_mode": "replace_all"
+            "update_mode": "backfill"
         }
     },
     "user_agent": {

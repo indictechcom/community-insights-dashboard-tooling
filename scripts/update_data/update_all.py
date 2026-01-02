@@ -13,13 +13,28 @@ successful_scripts = []
 for script in sorted(script_dir.glob("update_*.py")):
     if script.name != "update_all.py":
         logger.info(f"running {script.name}...")
-        result = subprocess.run(["python3", str(script)])
+        try:
+            result = subprocess.run(
+                ["python3", str(script)],
+                capture_output=True,
+                text=True,
+                timeout=3600
+            )
 
-        if result.returncode == 0:
-            successful_scripts.append(script.name)
-        else:
+            if result.returncode == 0:
+                successful_scripts.append(script.name)
+                logger.info(f"completed: {script.name}")
+            else:
+                failed_scripts.append(script.name)
+                logger.error(f"failed: {script.name} (exit code: {result.returncode})")
+                if result.stderr:
+                    logger.error(f"error output: {result.stderr}")
+        except subprocess.TimeoutExpired:
             failed_scripts.append(script.name)
-            logger.error(f"failed: {script.name}")
+            logger.error(f"timeout: {script.name} exceeded 1 hour")
+        except Exception as e:
+            failed_scripts.append(script.name)
+            logger.error(f"exception in {script.name}: {e}")
 
 logger.info(f"success: {len(successful_scripts)}, failed: {len(failed_scripts)}")
 if failed_scripts:
