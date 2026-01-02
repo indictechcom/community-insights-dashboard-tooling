@@ -16,8 +16,6 @@ for script in sorted(script_dir.glob("update_*.py")):
         try:
             result = subprocess.run(
                 ["python3", str(script)],
-                capture_output=True,
-                text=True,
                 timeout=3600
             )
 
@@ -27,8 +25,6 @@ for script in sorted(script_dir.glob("update_*.py")):
             else:
                 failed_scripts.append(script.name)
                 logger.error(f"failed: {script.name} (exit code: {result.returncode})")
-                if result.stderr:
-                    logger.error(f"error output: {result.stderr}")
         except subprocess.TimeoutExpired:
             failed_scripts.append(script.name)
             logger.error(f"timeout: {script.name} exceeded 1 hour")
