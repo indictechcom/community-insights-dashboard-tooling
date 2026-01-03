@@ -124,7 +124,7 @@
         },
         "user_pageviews_by_project": {
             "generation_query" : "None",
-            "destination_table": "user_pageviews_by_project",
+            "destination_table": "user_pageviews_by_project_daily",
             "update_mode": "replace_all"
         }
     },
