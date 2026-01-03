@@ -121,6 +121,11 @@
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/governance/ip_blocks_current.sql",
             "destination_table": "ip_blocks_current",
             "update_mode": "backfill"
+        },
+        "editor_user_counts_by_project" : {
+            "generation_query" : "None",
+            "destination_table": "editor_user_counts_by_project_daily",
+            "update_mode": "backfill"
         }
     },
     "user_agent": {
