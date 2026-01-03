@@ -1,8 +1,30 @@
 {
     "databases": [
-        "hiwiki",
-        "tewiki",
-        "mlwiki"
+        "anpwiki", 
+        "aswiki", 
+        "awawiki", 
+        "bhwiki", 
+        "bnwiki", 
+        "bpywiki", 
+        "gomwiki", 
+        "guwiki", 
+        "hiwiki", 
+        "knwiki", 
+        "kswiki", 
+        "maiwiki", 
+        "mlwiki", 
+        "mrwiki", 
+        "newiki", 
+        "newwiki", 
+        "orwiki", 
+        "pawiki", 
+        "piwiki", 
+        "satwiki", 
+        "sawiki", 
+        "sdwiki", 
+        "tawiki", 
+        "tewiki", 
+        "urwiki"
     ],
     "metric_map": {
         "most_used_templates": {
@@ -104,7 +126,7 @@
     "user_agent": {
         "tool": "Indic Wikimedia Community Insights Dashboard",
         "url": "https://github.com/indictechcom/community-insights-dashboard-tooling",
-        "email": ""
+        "email": "indic-community-insights-db.maintainers@toolforge.org"
     },
     "tool_database": {
         "name": "s57262__indic_community_insights_p",
