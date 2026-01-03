@@ -28,4 +28,24 @@ GROUP BY
   wiki_db,
   namespace,
   length_bucket
+ORDER BY
+  wiki_db,
+  CASE namespace
+    WHEN 'article' THEN 1
+    WHEN 'article_talk' THEN 2
+    WHEN 'draft' THEN 3
+    WHEN 'draft_talk' THEN 4
+  END,
+  CASE length_bucket
+    WHEN '0-2000' THEN 1
+    WHEN '2001-5000' THEN 2
+    WHEN '5001-10000' THEN 3
+    WHEN '10001-20000' THEN 4
+    WHEN '20001-30000' THEN 5
+    WHEN '30001-40000' THEN 6
+    WHEN '40001-50000' THEN 7
+    WHEN '50001-75000' THEN 8
+    WHEN '75001-100000' THEN 9
+    WHEN '100000+' THEN 10
+  END
 ;
