@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS user_pageviews_by_project_daily (
     `date`                  DATE            ,
     `view_count`            BIGINT          ,
     `is_latest`             BOOLEAN         NOT NULL DEFAULT TRUE,
-    PRIMARY KEY (`wiki_db`, `date`, `access_type`,`view_count`, `snapshot_date`),
+    PRIMARY KEY (`wiki_db`, `date`, `access_type`, `snapshot_date`),
     INDEX idx_latest (`is_latest`)
 )
 ENGINE=InnoDB
