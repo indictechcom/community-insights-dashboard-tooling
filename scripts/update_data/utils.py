@@ -1,14 +1,14 @@
 from datetime import datetime, timezone
-import urllib.request
+from typing import Optional, Dict, Any, Set
 import logging
 from logging.handlers import RotatingFileHandler
 import os
 
 import pandas as pd
+import requests
 
 
-def to_mysql_ts(ts):
-
+def to_mysql_ts(ts: Optional[str]) -> Optional[str]:
     if ts is not None:
         sql_ts = (
             datetime.fromisoformat(ts[:-1])
@@ -20,15 +20,17 @@ def to_mysql_ts(ts):
         return None
 
 
-def update_destination_table(df: pd.DataFrame, table: str, cur, metric_config: dict = None) -> None:
+def update_destination_table(df: pd.DataFrame, table: str, cur, metric_config: Optional[Dict[str, Any]] = None) -> None:
+    if df.empty:
+        raise ValueError("Cannot update table with empty dataframe")
 
     if metric_config:
-        update_mode = metric_config.get('update_mode', 'replace_all')
+        update_mode = metric_config.get('update_mode', 'backfill')
 
-        if update_mode == 'replace_all':
+        if update_mode == 'backfill':
             cur.execute(f"UPDATE {table} SET is_latest = FALSE WHERE is_latest = TRUE")
 
-        elif update_mode == 'append_period':
+        elif update_mode == 'incremental':
             if table.endswith('_monthly'):
                 period_col = 'month'
             elif table.endswith('_daily'):
@@ -36,12 +38,17 @@ def update_destination_table(df: pd.DataFrame, table: str, cur, metric_config: d
             else:
                 period_col = 'date'
 
-            if period_col in df.columns:
-                periods = tuple(df[period_col].unique())
-                if len(periods) == 1:
-                    cur.execute(f"UPDATE {table} SET is_latest = FALSE WHERE {period_col} = %s AND is_latest = TRUE", periods)
-                else:
-                    cur.execute(f"UPDATE {table} SET is_latest = FALSE WHERE {period_col} IN {sql_tuple(periods)} AND is_latest = TRUE")
+            if period_col not in df.columns:
+                raise ValueError(
+                    f"Incremental mode requires '{period_col}' column, "
+                    f"but it's missing from dataframe. Available columns: {df.columns.tolist()}"
+                )
+
+            periods = tuple(df[period_col].unique())
+            if len(periods) == 1:
+                cur.execute(f"UPDATE {table} SET is_latest = FALSE WHERE {period_col} = %s AND is_latest = TRUE", (periods[0],))
+            else:
+                cur.execute(f"UPDATE {table} SET is_latest = FALSE WHERE {period_col} IN {sql_tuple(periods)} AND is_latest = TRUE")
 
     df['is_latest'] = True
 
@@ -49,14 +56,11 @@ def update_destination_table(df: pd.DataFrame, table: str, cur, metric_config: d
     placeholders = ", ".join(["%s"] * len(columns))
     col_names = ", ".join(columns)
 
-    for _, row in df.iterrows():
-        cur.execute(
-            f"""
-            REPLACE INTO {table} ({col_names})
-            VALUES ({placeholders})
-        """,
-            tuple(row.values),
-        )
+    values = [tuple(row) for row in df.to_numpy()]
+    cur.executemany(
+        f"REPLACE INTO {table} ({col_names}) VALUES ({placeholders})",
+        values
+    )
 
 
 def clear_destination_table(table: str, cur) -> None:
@@ -88,28 +92,25 @@ def sql_tuple(i):
     list_repr = repr(i)
     return "(" + list_repr[1:-1] + ")"
 
-def get_query(url, user_agent_config=None):
-    if user_agent_config:
-        user_agent = f"{user_agent_config['tool']} ({user_agent_config['url']}; {user_agent_config.get('email', '')})"
-        req = urllib.request.Request(
-            url, 
-            data=None, 
-            headers={
-                'User-Agent': user_agent
-            }
-        )
-        with urllib.request.urlopen(req) as response:
-            return response.read().decode()
-    else:
-        with urllib.request.urlopen(url) as response:
-            return response.read().decode()
+def get_query(url: str, user_agent: Optional[str] = None, timeout: int = 30) -> str:
+    headers = {}
+    if user_agent:
+        headers['User-Agent'] = user_agent
 
-def setup_logging(script_name, max_bytes=10*1024*1024, backup_count=5):
+    try:
+        response = requests.get(url, headers=headers, timeout=timeout)
+        response.raise_for_status()
+        return response.text
+    except requests.Timeout:
+        raise requests.Timeout(f"Request to {url} timed out after {timeout} seconds")
+    except requests.RequestException as e:
+        raise requests.RequestException(f"Failed to fetch query from {url}: {e}")
+
+def setup_logging(script_name: str, max_bytes: int = 10*1024*1024, backup_count: int = 5) -> logging.Logger:
     log_dir = os.path.join(os.path.dirname(__file__), '../../logs')
     os.makedirs(log_dir, exist_ok=True) 
 
     log_file = os.path.join(log_dir, f'{script_name}.log')
-    master_log = os.path.join(log_dir, 'master.log')
 
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
@@ -121,14 +122,6 @@ def setup_logging(script_name, max_bytes=10*1024*1024, backup_count=5):
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(formatter)
 
-    master_handler = RotatingFileHandler(
-        master_log,
-        maxBytes=max_bytes,
-        backupCount=backup_count
-    )
-    master_handler.setLevel(logging.INFO)
-    master_handler.setFormatter(formatter)
-
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
@@ -136,13 +129,12 @@ def setup_logging(script_name, max_bytes=10*1024*1024, backup_count=5):
     logger = logging.getLogger(script_name)
     logger.setLevel(logging.INFO)
     logger.addHandler(file_handler)
-    logger.addHandler(master_handler)
     logger.addHandler(console_handler)
 
     return logger
 
 
-def validate_data(df, metric_name, min_rows=1):
+def validate_data(df: pd.DataFrame, metric_name: str, min_rows: int = 1, required_columns: Optional[Set[str]] = None) -> bool:
     if df.empty:
         raise ValueError(f"{metric_name}: dataframe is empty")
 
@@ -154,20 +146,31 @@ def validate_data(df, metric_name, min_rows=1):
     if null_cols:
         raise ValueError(f"{metric_name}: all-null columns: {null_cols}")
 
+    if required_columns:
+        missing = required_columns - set(df.columns)
+        if missing:
+            raise ValueError(f"{metric_name}: missing required columns: {missing}")
+
+        for col in required_columns:
+            if df[col].isnull().all():
+                raise ValueError(f"{metric_name}: required column '{col}' has all null values")
+
     return True
 
 
-def validate_schema(df, table, cur):
+def validate_schema(df: pd.DataFrame, table: str, cur) -> bool:
     cur.execute(f"DESCRIBE {table}")
     table_cols = {row[0] for row in cur.fetchall()}
     df_cols = set(df.columns)
 
-    missing = table_cols - df_cols
+    expected_in_df = table_cols - {'is_latest'}
+
+    missing = expected_in_df - df_cols
     extra = df_cols - table_cols
 
     if missing:
-        raise ValueError(f"missing columns in data: {missing}")
+        raise ValueError(f"Schema validation failed for table '{table}': dataframe is missing columns: {sorted(missing)}")
     if extra:
-        raise ValueError(f"extra columns in data: {extra}")
+        raise ValueError(f"Schema validation failed for table '{table}': dataframe has unexpected columns: {sorted(extra)}")
 
     return True
