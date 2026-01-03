@@ -10,4 +10,4 @@ DATABASE="s57262__indic_community_insights_p"
 HOST="tools.db.svc.wikimedia.cloud"
 
 mariadb --defaults-file="$CNF_PATH" -h "$HOST" "$DATABASE" < "$SQL_FILE" && \
-echo "Table bot_edits_daily created in $DATABASE."
+echo "Table  editor_user_counts_by_project_daily created in $DATABASE."
