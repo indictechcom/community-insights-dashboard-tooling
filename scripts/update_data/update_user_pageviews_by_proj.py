@@ -1,6 +1,6 @@
 import pandas as pd 
 import json 
-import io
+import requests
 import toolforge as forge
 from datetime import datetime, timedelta
 
@@ -55,11 +55,12 @@ def get_canonical_project_url(url, db_code):
 def fetch_and_create_df(project, wiki_db, start_date, end_date, access_type="all-access"):
     logger.info(f'fetching pageview data for {project} from {start_date} to {end_date}')
     url = f"{api}/aggregate/{project}/{access_type}/user/daily/{start_date}/{end_date}"
-    user_agent_config = config.get('user_agent')
+    user_agent = f"{config['user_agent']['tool']} ({config['user_agent']['url']}; {config['user_agent'].get('email','')})"
     snapshot_date = datetime.now().date()
     
-    res = get_query(url, user_agent_config)
-    raw_data = json.loads(res)
+    res = requests.get(url, headers={'User-Agent': user_agent}, timeout=60)
+    res.raise_for_status()
+    raw_data = res.json()
     records = []
 
     if raw_data and 'items' in raw_data:
