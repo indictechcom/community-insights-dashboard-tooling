@@ -47,8 +47,7 @@ def get_date_range():
 
 def get_canonical_project_url(url, db_code):
     logger.info(f'fetching project url of project with db code {db_code}')
-    res = get_query(url)
-    can_df = pd.read_csv(io.StringIO(res), sep='\t')
+    can_df = pd.read_csv(url, sep='\t')
     canonical_project_url = can_df[can_df['database_code'] == db_code]['domain_name'].values[0]
     logger.info(f'project url for the db code {db_code} is {canonical_project_url}')
     return canonical_project_url
