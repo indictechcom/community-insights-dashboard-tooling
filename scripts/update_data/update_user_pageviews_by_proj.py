@@ -29,9 +29,9 @@ user_agent = forge.set_user_agent(
 
 config_metric_key = 'user_pageviews_by_project'
 destination_table = config['metric_map'][config_metric_key]['destination_table']
-projects = config['projects']
+database_codes = config['databases']
 tool_database = config['tool_database']
-logger.info(f'target projects: {projects}')
+logger.info(f'target databases : {database_codes}')
 logger.info(f'destination table: {destination_table}')
 
 def get_date_range():
@@ -45,13 +45,13 @@ def get_date_range():
     return start_date, end_date
 
 
-def get_canonical_wiki_dbcode(url, proj_name):
-    logger.info(f'fetching canonical db code for {proj_name}')
+def get_canonical_project_url(url, db_code):
+    logger.info(f'fetching project url of project with db code {db_code}')
     res = get_query(url)
     can_df = pd.read_csv(io.StringIO(res), sep='\t')
-    canonical_dbcode = can_df[can_df['domain_name'] == proj_name]['database_code'].values[0]
-    logger.info(f'canonical db code for {proj_name}: {canonical_dbcode}')
-    return canonical_dbcode
+    canonical_project_url = can_df[can_df['database_code'] == db_code]['domain_name'].values[0]
+    logger.info(f'project url for the db code {db_code} is {canonical_project_url}')
+    return canonical_project_url
     
 def fetch_and_create_df(project, wiki_db, start_date, end_date, access_type="all-access"):
     logger.info(f'fetching pageview data for {project} from {start_date} to {end_date}')
@@ -82,10 +82,10 @@ def main():
     df = pd.DataFrame()
     start, end = get_date_range()
     
-    for project in projects:
-        logger.info(f'processing project: {project}')
-        wiki_db = get_canonical_wiki_dbcode(can_url, project)
-        project_df = fetch_and_create_df(project, wiki_db, start, end)
+    for db_code in database_codes:
+        logger.info(f'processing project with db code: {db_code}')
+        project_url = get_canonical_project_url(can_url, db_code)
+        project_df = fetch_and_create_df(project_url, db_code, start, end)
         df = pd.concat([df, project_df])
     
     df = df.reset_index(drop=True)
@@ -114,6 +114,8 @@ def main():
             logger.info('database connection closed')
     else:
         logger.warning('dataframe is empty')
+
+
 
 if __name__ == '__main__':
     main()
