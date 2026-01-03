@@ -58,7 +58,7 @@ def fetch_and_create_df(project, wiki_db, start_date, end_date,):
     user_agent = f"{config['user_agent']['tool']} ({config['user_agent']['url']}; {config['user_agent'].get('email','')})"
     snapshot_date = datetime.now().date()
     
-    res = requests.get(url, headers={'User-Agent': user_agent}, timeout=60)
+    res = requests.get(url, headers={'User-Agent': user_agent}, timeout=400)
     res.raise_for_status()
     raw_data = res.json()
     records = []
