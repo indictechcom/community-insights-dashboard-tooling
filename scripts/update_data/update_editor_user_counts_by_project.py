@@ -3,7 +3,8 @@ import json
 import requests
 import toolforge as forge
 from datetime import datetime, timedelta
-
+from dateutil.relativedelta import relativedelta
+import time
 
 from utils import (
     to_mysql_ts,
@@ -52,32 +53,77 @@ def get_canonical_project_url(url, db_code):
     logger.info(f'project url for the db code {db_code} is {canonical_project_url}')
     return canonical_project_url
     
-def fetch_and_create_df(project, wiki_db, start_date, end_date,):
+def get_date_chunks(start_date_str, end_date_str, chunk_months=12):
+    """Split date range into smaller chunks"""
+    start = datetime.strptime(start_date_str, '%Y%m%d')
+    end = datetime.strptime(end_date_str, '%Y%m%d')
+    
+    chunks = []
+    current = start
+    
+    while current < end:
+        chunk_end = min(current + relativedelta(months=chunk_months) - timedelta(days=1), end)
+        chunks.append({
+            'start': current.strftime('%Y%m%d'),
+            'end': chunk_end.strftime('%Y%m%d')
+        })
+        current = chunk_end + timedelta(days=1)
+    
+    return chunks
+
+def fetch_and_create_df(project, wiki_db, start_date, end_date):
     logger.info(f'fetching editor(user) counts data for {project} from {start_date} to {end_date}')
-    url = f"{api}/aggregate/{project}/user/all-page-types/all-activity-levels/daily/{start_date}/{end_date}"
     user_agent = f"{config['user_agent']['tool']} ({config['user_agent']['url']}; {config['user_agent'].get('email','')})"
     snapshot_date = datetime.now().date()
     
-    res = requests.get(url, headers={'User-Agent': user_agent}, timeout=400)
-    res.raise_for_status()
-    raw_data = res.json()
-    records = []
-
-    if raw_data and 'items' in raw_data:
-        for item in raw_data['items']:
-            if 'results' in item:
-                for result in item['results']:
-                    records.append({
-                        'snapshot_date': snapshot_date,
-                        'wiki_db': wiki_db,
-                        'date': to_mysql_ts(result['timestamp']).split()[0],
-                        'page_type': item.get('page-type'),
-                        'activity_level': item.get('activity-level'),
-                        'editor_count': result.get('editors', 0),
-                    })
+    chunks = get_date_chunks(start_date, end_date, chunk_months=24)
+    all_records = []
     
+    for i, chunk in enumerate(chunks):
+        logger.info(f'Fetching chunk {i+1}/{len(chunks)}: {chunk["start"]} to {chunk["end"]}')
+        url = f"{api}/aggregate/{project}/user/all-page-types/all-activity-levels/daily/{chunk['start']}/{chunk['end']}"
+        
+        max_retries = 5
+        retry_count = 0
+        chunk_success = False
+        
+        while retry_count < max_retries and not chunk_success:
+            try:
+                res = requests.get(url, headers={'User-Agent': user_agent}, timeout=120)
+                res.raise_for_status()
+                raw_data = res.json()
+                
+                if raw_data and 'items' in raw_data:
+                    for item in raw_data['items']:
+                        if 'results' in item:
+                            for result in item['results']:
+                                all_records.append({
+                                    'snapshot_date': snapshot_date,
+                                    'wiki_db': wiki_db,
+                                    'date': to_mysql_ts(result['timestamp']).split()[0],
+                                    'page_type': item.get('page-type'),
+                                    'activity_level': item.get('activity-level'),
+                                    'editor_count': result.get('editors', 0),
+                                    'is_latest': True
+                                })
+                
+                chunk_success = True
+                logger.info(f'Successfully fetched chunk {i+1}/{len(chunks)}')
+                
+                    
+            except requests.exceptions.RequestException as e:
+                retry_count += 1
+                logger.warning(f'Error fetching chunk {chunk["start"]} to {chunk["end"]} (attempt {retry_count}/{max_retries}): {e}')
+                
+                if retry_count < max_retries:
+                    wait_time = 2 * retry_count  
+                    logger.info(f'Waiting {wait_time} seconds before retry...')
+                    time.sleep(wait_time)
+                else:
+                    logger.error(f'Failed to fetch chunk after {max_retries} attempts. Skipping this chunk.')
+                    break
     
-    res_df = pd.DataFrame(records)
+    res_df = pd.DataFrame(all_records)
     logger.info(f'fetched {len(res_df)} rows for {project}')
     return res_df
 
@@ -90,7 +136,6 @@ def main():
         logger.info(f'processing project with db code: {db_code}')
         project_url = get_canonical_project_url(can_url, db_code)
         project_df = fetch_and_create_df(project_url, db_code, start, end)
-        print(project_df.head())
         df = pd.concat([df, project_df])
     
     df = df.reset_index(drop=True)
@@ -123,4 +168,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()  
+    main()
