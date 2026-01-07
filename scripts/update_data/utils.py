@@ -108,7 +108,7 @@ def get_query(url: str, user_agent: Optional[str] = None, timeout: int = 30) -> 
 
 def setup_logging(script_name: str, max_bytes: int = 10*1024*1024, backup_count: int = 5) -> logging.Logger:
     log_dir = os.path.join(os.path.dirname(__file__), '../../logs')
-    os.makedirs(log_dir, exist_ok=True)
+    os.makedirs(log_dir, exist_ok=True) 
 
     log_file = os.path.join(log_dir, f'{script_name}.log')
 

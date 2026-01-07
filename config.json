@@ -1,4 +1,4 @@
-{
+{   
     "databases": [
         "anpwiki", 
         "aswiki", 
@@ -126,6 +126,11 @@
             "generation_query" : "None",
             "destination_table": "editor_user_counts_by_project_daily",
             "update_mode": "backfill"
+        },
+        "user_pageviews_by_project": {
+            "generation_query" : "None",
+            "destination_table": "user_pageviews_by_project_daily",
+            "update_mode": "replace_all"
         }
     },
     "user_agent": {
@@ -137,4 +142,5 @@
         "name": "s57262__indic_community_insights_p",
         "host": "tools.db.svc.wikimedia.cloud"
     }
+    
 }
