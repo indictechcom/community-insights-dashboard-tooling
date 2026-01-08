@@ -122,6 +122,11 @@
             "destination_table": "ip_blocks_current",
             "update_mode": "backfill"
         },
+        "editor_user_counts_by_project" : {
+            "generation_query" : "None",
+            "destination_table": "editor_user_counts_by_project_daily",
+            "update_mode": "backfill"
+        },
         "user_pageviews_by_project": {
             "generation_query" : "None",
             "destination_table": "user_pageviews_by_project_daily",
