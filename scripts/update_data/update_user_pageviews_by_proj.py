@@ -1,12 +1,11 @@
-import pandas as pd 
-import json 
+import pandas as pd
+import json
 import requests
 import toolforge as forge
 from datetime import datetime, timedelta
 
 
 from utils import (
-    get_query,
     setup_logging,
     update_destination_table,
     validate_data,
@@ -53,12 +52,11 @@ def get_canonical_project_url(url, db_code):
     return canonical_project_url
     
 def fetch_and_create_df(project, wiki_db, start_date, end_date, access_type="all-access"):
-    logger.info(f'fetching pageview data for {project} from {start_date} to {end_date}')
+    logger.info(f'fetching pageview data for {project} from {start_date} to {end_date} for access type: {access_type}')
     url = f"{api}/aggregate/{project}/{access_type}/user/daily/{start_date}/{end_date}"
-    user_agent = f"{config['user_agent']['tool']} ({config['user_agent']['url']}; {config['user_agent'].get('email','')})"
     snapshot_date = datetime.now().date()
-    
-    res = requests.get(url, headers={'User-Agent': user_agent}, timeout=60)
+
+    res = requests.get(url, timeout=60)
     res.raise_for_status()
     raw_data = res.json()
     records = []
@@ -81,13 +79,17 @@ def main():
     logger.info('starting data fetch from Analytics API')
     df = pd.DataFrame()
     start, end = get_date_range()
-    
+    access_types = ['desktop', 'mobile-app', 'mobile-web', 'all-access']
+
     for db_code in database_codes:
         logger.info(f'processing project with db code: {db_code}')
         project_url = get_canonical_project_url(can_url, db_code)
-        project_df = fetch_and_create_df(project_url, db_code, start, end)
-        df = pd.concat([df, project_df])
-    
+
+        for access_type in access_types:
+            logger.info(f'fetching data for access type: {access_type}')
+            project_df = fetch_and_create_df(project_url, db_code, start, end, access_type)
+            df = pd.concat([df, project_df])
+
     df = df.reset_index(drop=True)
     logger.info(f'total rows collected: {len(df)}')
 
