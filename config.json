@@ -77,6 +77,11 @@
             "destination_table": "user_edits_daily",
             "update_mode": "backfill"
         },
+        "articles_created": {
+            "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/content/articles_created_daily.sql",
+            "destination_table": "articles_created_daily",
+            "update_mode": "backfill"
+        },
         "account_registrations": {
             "generation_query": "https://raw.githubusercontent.com/indictechcom/community-insights-dashboard-tooling/refs/heads/main/queries/generate/contributors/account_registrations_daily.sql",
             "destination_table": "account_registrations_daily",
