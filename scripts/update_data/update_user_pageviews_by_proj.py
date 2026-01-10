@@ -56,7 +56,7 @@ def fetch_and_create_df(project, wiki_db, start_date, end_date, access_type="all
     url = f"{api}/aggregate/{project}/{access_type}/user/daily/{start_date}/{end_date}"
     snapshot_date = datetime.now().date()
 
-    res = requests.get(url, timeout=60)
+    res = requests.get(url, headers={'User-Agent': user_agent}, timeout=60)
     res.raise_for_status()
     raw_data = res.json()
     records = []
@@ -66,7 +66,7 @@ def fetch_and_create_df(project, wiki_db, start_date, end_date, access_type="all
             records.append({
                 'snapshot_date': snapshot_date,
                 'wiki_db': wiki_db,
-                'access_type': item.get('access'),
+                'access_type': access_type,
                 'date': datetime.strptime(item['timestamp'], '%Y%m%d%H').date(),
                 'view_count': item.get('views', 0)
             })
